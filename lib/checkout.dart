@@ -1,6 +1,8 @@
 import 'dart:math';
 import 'package:assignment3/dishes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class checkout extends StatefulWidget {
   final Function(List<dish>) onPressedUpdate;
@@ -15,30 +17,55 @@ class checkout extends StatefulWidget {
 }
 
 class _checkoutState extends State<checkout> {
-  List<dish> tempList = [];
+  // List<dish> tempList = [];
+
+  //Function to calculate total bill of the items in the cart
+  double calTotal() {
+    double total = 0;
+    for (dish items in widget.checkoutDishes) {
+      total = total + items.price;
+    }
+    return total;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Checkout"),
+          title: Text("Cart"),
         ),
-        body: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 20,
-            ),
-            Text("Checkout", style: new TextStyle(fontSize: 28)),
-            SizedBox(
-              height: 40,
-            ),
-            Expanded(child: _listBuilder(context)),
-          ],
+        body: Container(
+          //decoration: BoxDecoration(color: Colors.grey),
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 20,
+              ),
+              Text("Checkout", style: new TextStyle(fontSize: 28)),
+              SizedBox(
+                height: 40,
+              ),
+              Expanded(child: _listBuilder(context)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Bill: " + calTotal().toString() + " Rs",
+                    style: new TextStyle(fontSize: 28),
+                  ),
+                ],
+              ),
+              //sizedbox to enhance UI
+              SizedBox(
+                height: 60,
+              ),
+            ],
+          ),
         ));
   }
 
   ListView _listBuilder(context) {
-    final _random = Random();
+    //final _random = Random();
     return ListView.builder(
       itemCount: widget.checkoutDishes.length,
       itemBuilder: (context, index) => Card(
@@ -51,12 +78,17 @@ class _checkoutState extends State<checkout> {
                 " " +
                 widget.checkoutDishes[index].price.toString()),
             leading: CircleAvatar(
-              child: Text(widget.checkoutDishes[index].name.substring(0, 1)),
+              child: Text(widget.checkoutDishes[index].name.substring(0, 1) +
+                  "" +
+                  widget.checkoutDishes[index].name.substring(
+                      widget.checkoutDishes[index].name.indexOf(" ") + 1,
+                      widget.checkoutDishes[index].name.indexOf(" ") + 2)),
             ),
             trailing: IconButton(
                 iconSize: 30,
                 color: Colors.red,
                 icon: Icon(Icons.remove_circle_rounded),
+                //async and await to properly utilize dialog box
                 onPressed: () async {
                   bool isRemove = false;
                   isRemove = await showDialog(
@@ -80,6 +112,7 @@ class _checkoutState extends State<checkout> {
                                   child: Text('No')),
                             ],
                           ));
+                  //print(isRemove);
                   setState(() {});
                   widget.onPressedUpdate(widget.checkoutDishes);
                 })),
